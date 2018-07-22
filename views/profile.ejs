@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Intelligent Irrigation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/views/images/favicon.png">
+     <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    var userid = <%= userid %>
+      var socket = io('/');
+//Register the socket
+socket.emit("register",userid);
+
+
+
+    //Notification Counter
+var NotificationCounter = 0;
+socket.on("sensedData",function(data){
+    NotificationCounter++;
+    document.getElementById('notification_counter').innerHTML=NotificationCounter;
+    console.log(data);
+});
+
+</script>
+
+<style>
+    body
+    {
+        font-family: 'Segoe UI Light', Tahoma, Geneva, Verdana, sans-serif
+    }
+    .col-1
+    {
+        font-size: 2.5em;
+        padding: .2em;
+        text-align: center;
+    }
+    #menu
+    {
+        background:#78909C;
+        padding: .2em;
+        font-size: 1.8em;
+        text-align: center;
+
+    }
+    #menu div:hover
+    {
+        cursor:pointer;
+        color:white;
+    }
+    #logobar
+    {
+        background-color: #37474F;
+        color:#76FF03;
+
+    }
+    #framearea
+    {
+        width: 100%;
+        height: 50em;
+        border: none;
+    }
+
+</style>
+</head>
+<body>
+    <div class="container">
+    <div id="logobar" class="row">
+        <div class="col-1">Notes Farm</div> 
+                
+    </div>
+    <div  id="menu"  class="row">
+        <div class="col-sm-2">
+                <%= datum %>
+        </div>
+        <div onclick="pageLoader('addFarm.html',this)" class="col-sm-2">
+                Farm
+            </div>
+            <div class="col-sm-2">
+                    Monitor
+                </div>
+                <div class="col-sm-2">
+                        Notifications<span id="notification_counter" class="badge">0</span>
+                    </div>
+    </div>
+
+    <div class="row">
+        <div class = "col-sm-10">
+            <iframe id="framearea" src=""></iframe>
+            </div>
+    </div>
+    </div>
+</body>
+<script>
+    function pageLoader(url,button)
+    {
+        document.getElementById('menu').style.color='#333';
+        button.style.color="white";
+        var frame = document.getElementById("framearea");
+        frame.src=url;
+    }
+
+</script>
+</html>

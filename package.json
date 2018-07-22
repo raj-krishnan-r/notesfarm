@@ -1,0 +1,34 @@
+{
+  "name": "morseserver",
+  "version": "1.0.0",
+  "description": "Server for NotesChat.",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cloud-env": "^0.2.2",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "mime": "^2.3.1",
+    "moment": "^2.22.2",
+    "mysql": "^2.15.0",
+    "pg": "^6.4.2",
+    "process": "^0.11.10",
+    "socket.io": "^2.1.1",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spiralcode/morseserver.git"
+  },
+  "author": "Raj Krishnan R",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/spiralcode/morseserver/issues"
+  },
+  "homepage": "https://github.com/spiralcode/morseserver#readme"
+}

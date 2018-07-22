@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+     <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+<link rel="stylesheet" href="/views/notes.css">
+<script src="/views/notes.js"></script>
+<style>
+    body{
+        padding: 2em;
+    }
+    #subpagetitle
+    {
+        padding: 1em;
+
+    }
+    #panels
+    {
+        margin: 1em;
+        padding: .2em;
+        color:#43A047;
+    }
+    #title
+    {
+        margin: 1em;
+    }
+.glyphicon glyphicon-plus
+{
+    padding: 1em;
+}
+#staticOptions
+{
+    margin: 1em;
+}
+    </style>
+    </head>
+    <body>
+<div class="container">
+    <div id="staticOption">
+<div id="staticOptions" class="row">
+    <div class="col">
+        <button onclick="flex.pop(0,'/views/sample.html');
+        " type="button" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-plus"></span> Add Farm
+          </button></div>
+
+</div>
+ </div>
+ </div>
+ <div>
+        <div id="panelspace">
+
+            </div>
+ </div>
+    
+    </body>
+    <script>
+        var itemsArray = new Array();
+        function farm()
+{
+  
+}
+    function addItem(title,position)
+    {
+        var root = document.createElement('div');
+        root.setAttribute("class","panel panel-default");
+        var panel = document.createElement('div');
+        var panel1 = document.createElement('div');
+        panel.setAttribute('class','panel-body');
+        panel.setAttribute('id','panels');
+        var row = document.createElement('div');
+        row.setAttribute('class','row');
+        var col = document.createElement('div');
+        col.setAttribute('class','col');
+   
+        var span0 = document.createElement('div');
+        var span1 = document.createElement('div');
+        var button = document.createElement('button');
+        button.innerHTML="Edit";
+        button.setAttribute('class','btn btn-primary');
+        button.setAttribute('data-position',position);
+        button.addEventListener("click",function(e){
+        flex.pop(0,"/views/sample.html",null,itemsArray[(button.dataset.position)].title);
+        });
+
+        var button1 = document.createElement('button');
+        button1.innerHTML="Monitor";
+        button1.setAttribute('data-position',position);
+        button1.setAttribute('class','btn btn-primary');
+        button1.addEventListener("click",function(e){
+            flex.pop(0,"/views/sample.html",null,itemsArray[(button.dataset.position)].title);
+        });
+        root.appendChild(panel);
+        panel.appendChild(panel1);
+        panel1.appendChild(row);
+        row.appendChild(col);
+        span0.setAttribute('class','col-sm-4');
+        span0.innerHTML=title;
+        span1.setAttribute('class','col-sm-6');
+        span1.style.align="right";
+        var btgroup = document.createElement('div');
+        btgroup.setAttribute('class','btn-group');
+        span1.appendChild(btgroup);
+
+        btgroup.appendChild(button);
+        btgroup.appendChild(button1);
+
+
+        col.appendChild(span0);
+        col.appendChild(btgroup);
+      
+       // row.appendChild(span0);
+        document.getElementById('panelspace').appendChild(root);
+
+    }
+
+$.get("/data",function(data){
+    var dec = JSON.parse(data);
+    var o = 0;
+    while(dec.length>o)
+    {
+        var ob = dec[o];
+       // addItem(ob.title,o);
+        itemsArray.push(dec[o]);
+        o++;
+    }
+    reloadList();
+});
+function reloadList()
+{
+    var i = (itemsArray.length)-1;
+    while(i>=0)
+    {
+        addItem(itemsArray[i].title,i);
+        i--;
+    }
+}
+function createAnUser(ob)
+{
+    
+    var title = document.getElementById('farm_title').value;
+    var desc = document.getElementById('farm_description').value;
+    if(title==''&&desc=='')
+    {
+        ob.innerHTML="Create";
+
+return;
+    }
+ob.innerHTML="Creating...";
+ob.disabled="disabled";
+
+    $.post("/createUser",{
+        title:title,description:desc
+    },function(data){
+        document.getElementById('farm_title').value="";
+        document.getElementById('farm_description').value="";
+        ob.innerHTML="Create";
+        ob.removeAttribute("disabled");
+
+        var result = JSON.parse(data);
+
+        var frm = new farm();
+        frm.id=result.id;
+        frm.title=result.title;
+        frm.farmerid=result.farmerid;
+        frm.description=result.description;
+
+        itemsArray.push(frm);
+        document.getElementById('panelspace').innerHTML="";
+        reloadList();
+    });
+
+}
+    </script>
+    </html>
