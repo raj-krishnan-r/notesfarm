@@ -16,6 +16,49 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
 <link rel="stylesheet" href="/views/notes.css">
 <script src="/views/notes.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+var socket = io('/');
+var updateStock = new Array();
+var selectedFarmid=0;
+socket.emit("register",1);
+socket.on("registerAck",function(data){
+socket.id=data;
+
+});
+
+function updateobj()
+{
+    
+}
+var NotificationCounter = 0;
+socket.on("sensedData",function(data){
+
+    var decoded = JSON.parse(data);
+    var update = new updateobj;
+    update.farmerid = decoded.farmerid;
+    update.data = decoded.sensedData;
+    update.farmid = decoded.farmid;
+    var i = 0,flag=0;
+    while(i<updateStock.length)
+    {
+        if(updateStock[i].farmid==decoded.farmid)
+        {
+            flag=1;
+            updateStock[i].data=decoded.sensedData;
+        }
+        
+        i++;
+    }
+    if(flag==0)
+    {
+        updateStock.push(update);
+    }
+    
+
+});
+</script>
 <style>
     body{
         padding: 2em;
@@ -86,21 +129,37 @@
    
         var span0 = document.createElement('div');
         var span1 = document.createElement('div');
+
+
+
+
         var button = document.createElement('button');
-        button.innerHTML="Edit";
+        button.innerHTML="Configure";
         button.setAttribute('class','btn btn-primary');
         button.setAttribute('data-position',position);
         button.addEventListener("click",function(e){
-        flex.pop(0,"/views/sample.html",null,itemsArray[(button.dataset.position)].title);
-        });
+        flex.pop(0,"/views/configure.html",null,"Network adapters for <strong>"+itemsArray[(button.dataset.position)].title+"</strong>");
+        selectedFarmid=itemsArray[(button.dataset.position)].id;
+       });
 
         var button1 = document.createElement('button');
         button1.innerHTML="Monitor";
         button1.setAttribute('data-position',position);
         button1.setAttribute('class','btn btn-primary');
         button1.addEventListener("click",function(e){
-            flex.pop(0,"/views/sample.html",null,itemsArray[(button.dataset.position)].title);
+            flex.pop(0,"/views/monitor.html",chartLoad,itemsArray[(button.dataset.position)].title,itemsArray[(button.dataset.position)].id);
         });
+
+        var button2 = document.createElement("button");
+        button2.innerHTML="Remove";
+        button2.setAttribute('data-position',position);
+        button2.setAttribute('class','btn btn-primary');
+        button2.addEventListener("click",function(e){
+            flex.pop(0,"/views/removeFarmConfirm.html",chartLoad,"Remove <strong>"+itemsArray[(button.dataset.position)].title+"</strong>?",itemsArray[(button.dataset.position)].id);
+            selectedFarmid=itemsArray[(button.dataset.position)].id;
+
+        });
+
         root.appendChild(panel);
         panel.appendChild(panel1);
         panel1.appendChild(row);
@@ -115,6 +174,7 @@
 
         btgroup.appendChild(button);
         btgroup.appendChild(button1);
+        btgroup.appendChild(button2);
 
 
         col.appendChild(span0);
@@ -182,5 +242,194 @@ ob.disabled="disabled";
     });
 
 }
+
+    function chartLoad(farmid)
+    {
+        google.charts.load('current', {'packages':['gauge']});
+      google.charts.setOnLoadCallback(drawChartThermometer);
+      google.charts.setOnLoadCallback(drawChartHygro);
+
+          var temperature = 0;
+            var humidity = 0;
+
+        setInterval(function(){
+            var i = 0;
+            while(i<updateStock.length)
+            {
+                var datapart = JSON.parse(updateStock[i].data);
+
+                if(updateStock[i].farmid==farmid)
+                {
+                    temperature = (datapart.temperature);
+                    humidity=(datapart.humidity);
+                }
+                i++;
+            }
+        },1000);
+      function drawChartThermometer() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Temperature', 0]
+         
+        ]);
+
+        var thermometer = {
+          width: 250, height: 250,
+          redFrom: 50, redTo: 100,
+          yellowFrom:40, yellowTo: 49,
+          greenFrom:30, greenTo:39,
+          minorTicks: 5
+        };
+
+  var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+
+        chart.draw(data, thermometer);
+        setInterval(function() {
+       
+          data.setValue(0, 1, temperature);
+          chart.draw(data, thermometer);
+
+        }, 1000);
+    
+      }
+function drawChartHygro() {
+var data = google.visualization.arrayToDataTable([
+  ['Label', 'Value'],
+  ['Humidity', 0]
+]);
+
+var hygrometer = {
+  width: 250, height: 250,
+  redFrom: 95, redTo: 100,
+  yellowFrom:60, yellowTo: 95,
+  greenFrom:20, greenTo:60,
+  minorTicks: 5
+};
+
+var chart = new google.visualization.Gauge(document.getElementById('chart_div_hygro'));
+
+     chart.draw(data, hygrometer);
+        setInterval(function() {
+       
+          data.setValue(0, 1, humidity);
+          chart.draw(data, hygrometer);
+
+        }, 1000);
+
+}
+    }
+
+var macListcount=-1;
+function addMac()
+{
+    document.getElementById("macaddsubmit").removeAttribute("disabled");
+    macListcount++;
+    var maclist = document.getElementById("maclist");
+    var div = document.createElement("div");
+    var input = document.createElement("input");
+    var label = document.createElement("input");
+    label.setAttribute("placeholder","Label Eg. North-East corner, Near road.");
+    label.setAttribute("id","maclabel-"+macListcount);
+    label.setAttribute("type","text");
+    input.setAttribute("id","mac-"+macListcount);
+    input.setAttribute("type","text");
+    input.setAttribute("placeholder","Enter MAC");
+    div.appendChild(label);
+    div.appendChild(input);
+    maclist.appendChild(div);
+}
+
+
+function registerMac()
+{
+var entity = function()
+{};
+
+var ent = new entity();
+    var i = 0;
+    while(document.getElementById("mac-"+i))
+    {
+        $.post("addMac",{ack:i,mac:document.getElementById("mac-"+i).value,farmid:selectedFarmid,label:document.getElementById("maclabel-"+i).value},function(data){
+            var decoded = JSON.parse(data);
+
+            if(decoded.status==1)
+            {
+                document.getElementById("maclabel-"+decoded.ack).remove();
+                document.getElementById("mac-"+decoded.ack).remove();
+
+                bootstrapAlert("info","Mac : "+decoded.mac+" added");
+                macListcount=-1;
+
+            }
+            else
+            {
+                bootstrapAlert("danger","Mac : "+decoded.mac+" not added");
+
+
+            }
+        });
+
+        i++;
+    }
+}
+function bootstrapAlert(type,message)
+{
+    var rootdiv = document.createElement("div");
+    var body = document.getElementsByTagName("body")[0];
+    if(type=="info")
+    {
+        rootdiv.setAttribute("class","alert alert-success");
+        
+    }
+    if(type=="danger")
+    {
+        rootdiv.setAttribute("class","alert alert-danger");
+        
+    }
+    rootdiv.innerHTML=message;
+body.appendChild(rootdiv);
+}
+
+function loadMacList()
+{
+    $.get("/getMac?farmid="+selectedFarmid,function(data){
+        
+var decoded = JSON.parse(data);
+var i = 0;
+var maclist = document.getElementById("maclist");
+maclist.innerHTML="";
+while(i<decoded.length)
+{
+    var dec= decoded[i];
+    
+var div = document.createElement("div");
+div.setAttribute("class","row");
+var label = document.createElement("span");
+label.setAttribute("class","col-sm-5");
+var mac = document.createElement("span");
+mac.setAttribute("class","col-sm-4");
+var edit = document.createElement("span");
+edit.setAttribute("class","col-sm-2");
+edit.style.marginLeft="5px";
+var innericon = document.createElement("span");
+innericon.setAttribute("class","glyphicon glyphicon-edit");
+edit.appendChild(innericon);
+
+
+label.innerHTML=dec.label;
+mac.innerHTML=dec.mac;
+div.appendChild(label);
+div.appendChild(mac);
+div.appendChild(edit);
+maclist.appendChild(div);
+i++;   
+}
+
+
+    });
+}
+
+
     </script>
     </html>

@@ -6,7 +6,7 @@ Notes Flex library
 */
 var flex = {};
 flex = {
-    pop:function(type,url,callback,titleText=""){
+    pop:function(type,url,callback,titleText="",farmid){
         if(document.getElementById("flex_frame"))
         {
         document.getElementById("flex_frame").remove();
@@ -34,7 +34,15 @@ flex = {
                 mainframe.appendChild(title);
                 mainframe.appendChild(content);
                 body.appendChild(mainframe);
+                mainframe.addEventListener("keyup",function(data){
+                    console.log(data);
+                });
+                mainframe.focus();
                 flex.placeAtCenter(mainframe);
+                if(callback!=null)
+                {
+                    callback(farmid);
+                }
 
             })  }
     },
@@ -48,4 +56,10 @@ placeAtCenter:function(obj)
     obj.style.top = (screenHeight/2)-(dimension.height/2)+"px";
     obj.style.left = ((screenWidth/2)-(dimension.width/2))+"px";
     obj.style.position = "absolute";
-}};
+},
+popclose:function()
+{
+    document.getElementById("flex_frame").remove();
+}
+
+};

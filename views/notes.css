@@ -7,11 +7,14 @@
         z-index: 500;
         border-radius: 2px;
         background: #8BC34A;
+        margin: 1em;
     }
     .mainframe .title
     {
         position: relative;
         text-align: center;
+        font-size: 1.2em;
+        text-decoration: bold;
         font-family: 'Segoe UI Light', Tahoma, Geneva, Verdana, sans-serif;
     }
     .mainframe .content

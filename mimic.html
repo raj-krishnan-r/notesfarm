@@ -8,24 +8,41 @@
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <script src="main.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-<script>
-  var socket = io('/');
- function dataPackage()
- {
-     this.mac="";
-     this.humidity=0;
-     this.temperature=0;
- }
 
- var sensedData = new dataPackage();
-  sensedData.mac = '12:00:00:00:00:0X';
-  sensedData.humidity=50; //Holds a value between 0 - 800 depends upon the device or sensor used.
-  sensedData.temperature=35; //In degree celsius 
-    console.log(JSON.stringify(sensedData));
-    socket.emit('sensedData', JSON.stringify(sensedData));
-</script>
 </head>
 <body>
     
+Humidity : <span id="hum" ></span> Temperature <span id="temp"></span>
+<script>
+    var socket = io('/');
+   function dataPackage()
+   {
+       this.mac="";
+       this.humidity=0;
+       this.temperature=0;
+   }
+  setInterval(function(){
+   var sensedData = new dataPackage();
+    sensedData.mac = '12:00:00:00:00:0X';
+    sensedData.humidity= Math.floor((Math.random() * 150) + 1); ; //Holds a value between 0 - 800 depends upon the device or sensor used.
+    sensedData.temperature= Math.floor((Math.random() * 150) + 1); ; //In degree celsius 
+    socket.emit('sensedData', JSON.stringify(sensedData));
+
+    document.getElementById("hum").innerHTML=sensedData.humidity;
+    document.getElementById("temp").innerHTML=sensedData.temperature;
+
+    sensedData.mac = '12:89:56:50:78:AY';
+    sensedData.humidity= Math.floor((Math.random() * 150) + 1); ; //Holds a value between 0 - 800 depends upon the device or sensor used.
+    sensedData.temperature= Math.floor((Math.random() * 150) + 1); ; //In degree celsius 
+    socket.emit('sensedData', JSON.stringify(sensedData));
+
+    sensedData.mac = '12:89:56:50:78:AQ';
+    sensedData.humidity= Math.floor((Math.random() * 150) + 1); ; //Holds a value between 0 - 800 depends upon the device or sensor used.
+    sensedData.temperature= Math.floor((Math.random() * 150) + 1); ; //In degree celsius 
+    socket.emit('sensedData', JSON.stringify(sensedData));
+
+      console.log(JSON.stringify(sensedData));
+  },5000);
+  </script>
 </body>
 </html>

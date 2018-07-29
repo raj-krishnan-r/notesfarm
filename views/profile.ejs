@@ -17,7 +17,7 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-    var userid = <%= userid %>
+    var userid = <%= userid %>;
       var socket = io('/');
 //Register the socket
 socket.emit("register",userid);
@@ -25,13 +25,11 @@ socket.emit("register",userid);
 
 
     //Notification Counter
-var NotificationCounter = 0;
-socket.on("sensedData",function(data){
-    NotificationCounter++;
-    document.getElementById('notification_counter').innerHTML=NotificationCounter;
-    console.log(data);
-});
 
+socket.on("sensedData",function(data)
+{
+   // console.log(data);
+});
 </script>
 
 <style>
@@ -62,6 +60,8 @@ socket.on("sensedData",function(data){
     {
         background-color: #37474F;
         color:#76FF03;
+        background:url(http://notz.xyz/cdn/indveg.jpeg);
+        text-shadow: 0px 0px 10px black;
 
     }
     #framearea
